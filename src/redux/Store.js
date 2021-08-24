@@ -1,6 +1,7 @@
 import {createStore, combineReducers, applyMiddleware, compose} from 'redux';
 import LoginUser from './Reducer/LoginReducer';
 import SignupUser from './Reducer/SignupReducer';
+import Project from './Reducer/ProjectReducer';
 import Poll from './Reducer/PollReducer';
 import singlePoll from './Reducer/SignlePollReduce';
 import Vote from './Reducer/VoteReducer';
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
   poll: Poll,
   singlePoll: singlePoll,
   vote: Vote,
+  ProjectReducer: Project,
 });
 
 const store = createStore(

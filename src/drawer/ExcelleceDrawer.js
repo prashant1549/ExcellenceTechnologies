@@ -5,15 +5,15 @@ import {
   DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-import HomePage from '../components/pages/HomePage';
+import {View, Text, Pressable} from 'react-native';
+import Dashboard from '../components/pages/Dashboard';
 import Logout from '../components/pages/Logout';
 
 const Drawer = createDrawerNavigator();
 
 const getIcon = screenName => {
   switch (screenName) {
-    case 'HomePage':
+    case 'Dashboard':
       return 'home';
     case 'logout':
       return 'logout';
@@ -26,59 +26,61 @@ const getIcon = screenName => {
 function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props} safeArea>
-      <VStack space={6} my={2} mx={1}>
-        <Box px={4}>
-          <Text bold color="gray.700">
-            Mail
-          </Text>
-          <Text fontSize={14} mt={1} color="gray.500" fontWeight={500}>
+      <View>
+        <View
+          style={{justifyContent: 'center', alignItems: 'center', padding: 20}}>
+          <Text style={{fontWeight: 'bold', color: 'gray'}}>Mail</Text>
+          <Text style={{fontSize: 14, color: 'gray', fontWeight: 'bold'}}>
             john_doe@gmail.com
           </Text>
-        </Box>
-        <VStack divider={<Divider />} space={4}>
-          <VStack space={3}>
-            {props.state.routeNames.map((name, index) => (
-              <Pressable
-                key={index}
-                px={5}
-                py={3}
-                rounded="md"
-                bg={
+        </View>
+        <View
+          style={{width: 350, height: 1, borderWidth: 1, borderColor: 'gray'}}
+        />
+        <View>
+          {props.state.routeNames.map((name, index) => (
+            <Pressable
+              style={{
+                backgroundColor:
                   index === props.state.index
                     ? 'rgba(6, 182, 212, 0.1)'
-                    : 'transparent'
-                }
-                onPress={event => {
-                  props.navigation.navigate(name);
+                    : 'transparent',
+              }}
+              key={index}
+              onPress={event => {
+                props.navigation.navigate(name);
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingVertical: 10,
                 }}>
-                <HStack space={7} alignItems="center">
-                  <Icon size={30} color="#900" name={getIcon(name)} />
-                  <Text
-                    fontWeight={500}
-                    color={
-                      index === props.state.index ? 'primary.500' : 'gray.700'
-                    }>
-                    {name}
-                  </Text>
-                </HStack>
-              </Pressable>
-            ))}
-          </VStack>
-        </VStack>
-      </VStack>
+                <Icon size={30} color="gray" name={getIcon(name)} />
+                <Text
+                  style={{
+                    marginHorizontal: 20,
+                    fontWeight: 'bold',
+                    color: index == props.state.index ? 'lightblue' : 'gray',
+                  }}>
+                  {name}
+                </Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      </View>
     </DrawerContentScrollView>
   );
 }
 export default function ExcelleceDrawer() {
   return (
-    <NativeBaseProvider>
-      <Box safeArea flex={1}>
-        <Drawer.Navigator
-          drawerContent={props => <CustomDrawerContent {...props} />}>
-          <Drawer.Screen name="HomePage" component={HomePage} />
-          <Drawer.Screen name="logout" component={Logout} />
-        </Drawer.Navigator>
-      </Box>
-    </NativeBaseProvider>
+    <View style={{flex: 1}}>
+      <Drawer.Navigator
+        drawerContent={props => <CustomDrawerContent {...props} />}>
+        <Drawer.Screen name="Dashboard" component={Dashboard} />
+        <Drawer.Screen name="logout" component={Logout} />
+      </Drawer.Navigator>
+    </View>
   );
 }
