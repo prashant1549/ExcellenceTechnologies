@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1099311539417",
+    "project_id": "animationproject-82da8",
+    "storage_bucket": "animationproject-82da8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1099311539417:android:84475b2e307f1d25e70ac8",
+        "android_client_info": {
+          "package_name": "com.excellencetexhnology"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1099311539417-78vkcbg64kssqhfr0iv9vtfd23magbi8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuZkpg26VSf1NOURyj9KUtYOLlEGleP2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1099311539417-78vkcbg64kssqhfr0iv9vtfd23magbi8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
