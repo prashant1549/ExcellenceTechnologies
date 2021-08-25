@@ -40,3 +40,5 @@ export const ACCESS_TOKEN = 'ACCESS_TOKEN';
 
 export const CREATE_PROJECT = 'CREATE_PROJECT';
 export const ALL_PROJECT = 'ALL_PROJECT';
+export const USER_PROFILE = 'USER_PROFILE';
+export const CREATE_EMPLOYEE = 'CREATE_EMPLOYEE';

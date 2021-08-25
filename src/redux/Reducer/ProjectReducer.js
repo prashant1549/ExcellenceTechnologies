@@ -1,7 +1,14 @@
-import {CREATE_PROJECT, ALL_PROJECT} from '../Action/Type';
+import {
+  CREATE_PROJECT,
+  ALL_PROJECT,
+  USER_PROFILE,
+  CREATE_EMPLOYEE,
+} from '../Action/Type';
 
 const initialState = {
   project: [],
+  user: {},
+  employees: [],
 };
 
 export default (state = initialState, action) => {
@@ -15,6 +22,16 @@ export default (state = initialState, action) => {
       return {
         ...state,
         project: action.data,
+      };
+    case USER_PROFILE:
+      return {
+        ...state,
+        user: action.user,
+      };
+    case CREATE_EMPLOYEE:
+      return {
+        ...state,
+        employees: state.employees.concat(action.data),
       };
     default:
       return state;

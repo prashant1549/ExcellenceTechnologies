@@ -26,8 +26,14 @@ import {
   ACCESS_TOKEN,
   CREATE_PROJECT,
   ALL_PROJECT,
+  USER_PROFILE,
+  CREATE_EMPLOYEE,
 } from './Type';
 
+export const createEmployee = data => ({
+  type: CREATE_EMPLOYEE,
+  data: data,
+});
 export const loginSuccess = payload => ({
   type: LOGIN_SUCCESS,
   payload,
@@ -35,6 +41,10 @@ export const loginSuccess = payload => ({
 export const accessToken = token => ({
   type: ACCESS_TOKEN,
   token: token,
+});
+export const userProfile = user => ({
+  type: USER_PROFILE,
+  user: user,
 });
 export const allProjects = data => ({
   type: ALL_PROJECT,

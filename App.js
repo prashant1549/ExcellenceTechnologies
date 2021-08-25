@@ -8,6 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './src/components/Login';
 import ExcelleceDrawer from './src/drawer/ExcelleceDrawer';
 import AddProject from './src/components/pages/AddProject';
+import UserProfile from './src/components/pages/UserProfile';
+import ProjectDetails from './src/components/pages/ProjectDetails';
+
 const Stack = createNativeStackNavigator();
 const App = () => {
   const dispatch = useDispatch();
@@ -40,6 +43,8 @@ const App = () => {
               component={ExcelleceDrawer}
             />
             <Stack.Screen name="Add Project" component={AddProject} />
+            <Stack.Screen name="Profile" component={UserProfile} />
+            <Stack.Screen name="Project Details" component={ProjectDetails} />
           </>
         )}
       </Stack.Navigator>

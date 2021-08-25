@@ -5,9 +5,11 @@ import {
   DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {View, Text, Pressable} from 'react-native';
+import {View, Text, Pressable, Image, TouchableOpacity} from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
 import Logout from '../components/pages/Logout';
+import AddEmployee from '../components/pages/AddEmpolyee';
+import {useSelector} from 'react-redux';
 
 const Drawer = createDrawerNavigator();
 
@@ -15,6 +17,8 @@ const getIcon = screenName => {
   switch (screenName) {
     case 'Dashboard':
       return 'home';
+    case 'Create Employee':
+      return 'person-add';
     case 'logout':
       return 'logout';
 
@@ -24,14 +28,22 @@ const getIcon = screenName => {
 };
 
 function CustomDrawerContent(props) {
+  const Data = useSelector(state => state.ProjectReducer.user);
   return (
     <DrawerContentScrollView {...props} safeArea>
       <View>
         <View
           style={{justifyContent: 'center', alignItems: 'center', padding: 20}}>
-          <Text style={{fontWeight: 'bold', color: 'gray'}}>Mail</Text>
-          <Text style={{fontSize: 14, color: 'gray', fontWeight: 'bold'}}>
-            john_doe@gmail.com
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate('Profile')}>
+            <Image
+              style={{width: 60, height: 60, borderRadius: 30}}
+              source={{uri: Data.photo}}
+            />
+          </TouchableOpacity>
+
+          <Text style={{fontSize: 12, color: 'gray', fontWeight: 'bold'}}>
+            {Data.email}
           </Text>
         </View>
         <View
@@ -73,12 +85,13 @@ function CustomDrawerContent(props) {
     </DrawerContentScrollView>
   );
 }
-export default function ExcelleceDrawer() {
+export default function ExcelleceDrawer({navigation}) {
   return (
     <View style={{flex: 1}}>
       <Drawer.Navigator
         drawerContent={props => <CustomDrawerContent {...props} />}>
         <Drawer.Screen name="Dashboard" component={Dashboard} />
+        <Drawer.Screen name="Create Employee" component={AddEmployee} />
         <Drawer.Screen name="logout" component={Logout} />
       </Drawer.Navigator>
     </View>

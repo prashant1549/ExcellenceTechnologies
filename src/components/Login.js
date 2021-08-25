@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
-import {loginRequest, accessToken} from '../redux/Action/Action';
+import {userProfile, accessToken} from '../redux/Action/Action';
 export default function Login({navigation}) {
   // const toast = useToast();
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ export default function Login({navigation}) {
         .set(unseData);
       await AsyncStorage.setItem('AceessToken', userInfo.idToken);
       dispatch(accessToken(userInfo.idToken));
-      await dispatch(loginRequest(userInfo.user));
+      dispatch(userProfile(userInfo.user));
       ToastAndroid.showWithGravityAndOffset(
         'Successfully login',
         ToastAndroid.LONG,
