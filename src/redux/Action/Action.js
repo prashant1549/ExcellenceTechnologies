@@ -24,6 +24,8 @@ import {
   LOGIN_ERROR,
   SIGNUP_ERROR,
   ACCESS_TOKEN,
+  CREATE_PROJECT,
+  ALL_PROJECT,
 } from './Type';
 
 export const loginSuccess = payload => ({
@@ -33,6 +35,14 @@ export const loginSuccess = payload => ({
 export const accessToken = token => ({
   type: ACCESS_TOKEN,
   token: token,
+});
+export const allProjects = data => ({
+  type: ALL_PROJECT,
+  data: data,
+});
+export const createProject = data => ({
+  type: CREATE_PROJECT,
+  data: data,
 });
 
 export const loginError = payload => ({

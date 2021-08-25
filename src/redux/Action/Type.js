@@ -37,3 +37,6 @@ export const ADD_VOTE_REQ = 'ADD_VOTE_REQ';
 export const ADD_VOTE_SUCCESS = 'ADD_VOTE_SUCCESS';
 
 export const ACCESS_TOKEN = 'ACCESS_TOKEN';
+
+export const CREATE_PROJECT = 'CREATE_PROJECT';
+export const ALL_PROJECT = 'ALL_PROJECT';
