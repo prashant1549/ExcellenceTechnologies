@@ -3,6 +3,7 @@ import {
   ALL_PROJECT,
   USER_PROFILE,
   CREATE_EMPLOYEE,
+  ALL_EMPLOYEE,
 } from '../Action/Type';
 
 const initialState = {
@@ -32,6 +33,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         employees: state.employees.concat(action.data),
+      };
+    case ALL_EMPLOYEE:
+      return {
+        ...state,
+        employees: action.data,
       };
     default:
       return state;

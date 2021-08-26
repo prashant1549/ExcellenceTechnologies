@@ -9,7 +9,10 @@ import {View, Text, Pressable, Image, TouchableOpacity} from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
 import Logout from '../components/pages/Logout';
 import AddEmployee from '../components/pages/AddEmpolyee';
-import {useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import {allEmployee} from '../redux/Action/Action';
 
 const Drawer = createDrawerNavigator();
 
@@ -28,7 +31,7 @@ const getIcon = screenName => {
 };
 
 function CustomDrawerContent(props) {
-  const Data = useSelector(state => state.ProjectReducer.user);
+  const Data = auth().currentUser;
   return (
     <DrawerContentScrollView {...props} safeArea>
       <View>
@@ -38,7 +41,7 @@ function CustomDrawerContent(props) {
             onPress={() => props.navigation.navigate('Profile')}>
             <Image
               style={{width: 60, height: 60, borderRadius: 30}}
-              source={{uri: Data.photo}}
+              source={{uri: Data.photoURL}}
             />
           </TouchableOpacity>
 
@@ -86,6 +89,17 @@ function CustomDrawerContent(props) {
   );
 }
 export default function ExcelleceDrawer({navigation}) {
+  const dispatch = useDispatch();
+  useEffect(async () => {
+    const employees = [];
+    const proj = firestore().collection('Empolyee');
+    const snapshot = await proj.get();
+    snapshot.forEach(doc => {
+      employees.push(doc.data());
+    });
+    dispatch(allEmployee(employees));
+    return () => subscriber();
+  }, [navigation]);
   return (
     <View style={{flex: 1}}>
       <Drawer.Navigator

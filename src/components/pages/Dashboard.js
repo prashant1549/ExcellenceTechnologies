@@ -11,7 +11,8 @@ const Dashboard = ({navigation}) => {
     const proj = firestore().collection('projects');
     const snapshot = await proj.get();
     snapshot.forEach(doc => {
-      projects.push(doc.data());
+      const data = {...doc.data(), ...{projectId: doc.id}};
+      projects.push(data);
     });
     dispatch(allProjects(projects));
     return () => subscriber();

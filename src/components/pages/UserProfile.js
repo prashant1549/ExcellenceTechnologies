@@ -1,15 +1,19 @@
 import React from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import {useSelector} from 'react-redux';
+import auth from '@react-native-firebase/auth';
 
 const UserProfile = ({navigation}) => {
-  const Data = useSelector(state => state.ProjectReducer.user);
+  const Data = auth().currentUser;
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{alignItems: 'center', marginTop: 20}}>
-        <Image style={{width: 150, height: 150}} source={{uri: Data.photo}} />
+        <Image
+          style={{width: 150, height: 150}}
+          source={{uri: Data.photoURL}}
+        />
         <Text style={{fontSize: 20, marginVertical: 10, fontWeight: 'bold'}}>
-          {Data.name.toUpperCase()}
+          {Data.displayName.toUpperCase()}
         </Text>
       </View>
       <View>

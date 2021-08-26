@@ -10,27 +10,18 @@ import {
 
 import firestore from '@react-native-firebase/firestore';
 import {useDispatch} from 'react-redux';
+import auth from '@react-native-firebase/auth';
 import {createEmployee} from '../../redux/Action/Action';
 
 const AddEmployee = ({navigation}) => {
   const dispatch = useDispatch();
   const [employee, setEmployee] = useState({
-    empId: '',
-    empName: '',
-    contact: '',
-    empEmail: '',
-    projects: [],
-    designation: '',
+    email: '',
+    name: '',
   });
 
   const handleSubmit = async () => {
-    if (
-      employee.empId == '' ||
-      employee.empName == '' ||
-      employee.contact == '' ||
-      employee.empEmail == '' ||
-      employee.designation == ''
-    ) {
+    if (employee.email == '' || employee.name == '') {
       ToastAndroid.showWithGravityAndOffset(
         'Please fill all given field',
         ToastAndroid.LONG,
@@ -39,25 +30,41 @@ const AddEmployee = ({navigation}) => {
         50,
       );
     } else {
-      dispatch(createEmployee(employee));
-      const usersCollection = firestore()
-        .collection('allemployee')
-        .add(employee);
+      auth()
+        .createUserWithEmailAndPassword(employee.email, employee.name)
+        .then(res => {
+          const unseData = {
+            email: res.user._user.email,
+            role: 'empolyee',
+            projects: [],
+          };
+          dispatch(createEmployee(unseData));
+          const usersCollection = firestore()
+            .collection('Empolyee')
+            .doc(res.user._user.uid)
+            .set(unseData);
+          ToastAndroid.showWithGravityAndOffset(
+            'Successfully created',
+            ToastAndroid.LONG,
+            ToastAndroid.BOTTOM,
+            25,
+            50,
+          );
+        })
+        .catch(error => {
+          if (error.code === 'auth/email-already-in-use') {
+            console.log('That email address is already in use!');
+          }
 
-      ToastAndroid.showWithGravityAndOffset(
-        'Successfully created',
-        ToastAndroid.LONG,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
-      );
+          if (error.code === 'auth/invalid-email') {
+            console.log('That email address is invalid!');
+          }
+          console.error(error);
+        });
+
       const data = {
-        empId: '',
-        empName: '',
-        contact: '',
-        empEmail: '',
-        projects: [],
-        designation: '',
+        email: '',
+        name: '',
       };
       setEmployee(data);
       navigation.navigate('Dashboard');
@@ -83,51 +90,10 @@ const AddEmployee = ({navigation}) => {
       </View>
       <View>
         <TextInput
-          placeholder="Enter Employee Name"
-          placeholderTextColor="gray"
-          value={employee.empName}
-          onChangeText={text => handleChange(text, 'empName')}
-          style={{
-            borderBottomWidth: 1,
-            width: 300,
-            marginHorizontal: 10,
-            marginVertical: 10,
-            color: '#000',
-          }}
-        />
-        <TextInput
-          placeholder="Enter employee unique id"
-          placeholderTextColor="gray"
-          value={employee.empId}
-          onChangeText={text => handleChange(text, 'empId')}
-          style={{
-            borderBottomWidth: 1,
-            width: 300,
-            marginHorizontal: 10,
-            marginVertical: 10,
-            color: '#000',
-          }}
-        />
-
-        <TextInput
           placeholder="Enter employee email"
           placeholderTextColor="gray"
-          value={employee.empEmail}
-          onChangeText={text => handleChange(text, 'empEmail')}
-          style={{
-            borderBottomWidth: 1,
-            width: 300,
-            marginHorizontal: 10,
-            marginVertical: 10,
-            color: '#000',
-          }}
-        />
-
-        <TextInput
-          placeholder="Enter contact number"
-          placeholderTextColor="gray"
-          value={employee.contact}
-          onChangeText={text => handleChange(text, 'contact')}
+          value={employee.email}
+          onChangeText={text => handleChange(text, 'email')}
           style={{
             borderBottomWidth: 1,
             width: 300,
@@ -137,10 +103,10 @@ const AddEmployee = ({navigation}) => {
           }}
         />
         <TextInput
-          placeholder="Enter employee designation"
+          placeholder="Enter Employee name"
           placeholderTextColor="gray"
-          value={employee.designation}
-          onChangeText={text => handleChange(text, 'designation')}
+          value={employee.name}
+          onChangeText={text => handleChange(text, 'name')}
           style={{
             borderBottomWidth: 1,
             width: 300,
@@ -149,7 +115,6 @@ const AddEmployee = ({navigation}) => {
             color: '#000',
           }}
         />
-
         <View style={{flex: 2, alignItems: 'center', marginVertical: 60}}>
           <TouchableOpacity
             onPress={() => handleSubmit()}

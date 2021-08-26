@@ -28,10 +28,15 @@ import {
   ALL_PROJECT,
   USER_PROFILE,
   CREATE_EMPLOYEE,
+  ALL_EMPLOYEE,
 } from './Type';
 
 export const createEmployee = data => ({
   type: CREATE_EMPLOYEE,
+  data: data,
+});
+export const allEmployee = data => ({
+  type: ALL_EMPLOYEE,
   data: data,
 });
 export const loginSuccess = payload => ({
