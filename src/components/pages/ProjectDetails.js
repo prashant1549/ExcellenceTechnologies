@@ -1,13 +1,28 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ToastAndroid} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ToastAndroid,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import MultiSelect from 'react-native-multiple-select';
 import firestore from '@react-native-firebase/firestore';
 import {allProjects} from '../../redux/Action/Action';
+import {TextInput} from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
 
 const ProjectDetails = props => {
   const dispatch = useDispatch();
   const [emp, setEmp] = useState([]);
+  const [dateVisible, setDateVisible] = useState(false);
+  const [addWorkVisible, setAddWorkVisible] = useState(false);
+  const [emparray, setEmpArray] = useState([]);
+  const [addTime, setAddtime] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const Data = useSelector(state => state.ProjectReducer.project);
   const filterProject = Data.filter(
@@ -16,12 +31,15 @@ const ProjectDetails = props => {
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
       const employees = [];
+      const data1 = [];
       const proj = firestore().collection('Empolyee');
       const snapshot = await proj.get();
       snapshot.forEach(doc => {
-        console.log('jankjan', doc.data());
         const data = {id: doc.id, name: doc.data().name};
+        const emp1 = {id: doc.id, user: doc.data()};
+        data1.push(emp1);
         employees.push(data);
+        setEmpArray(data1);
       });
       setEmp(employees);
     });
@@ -76,173 +94,282 @@ const ProjectDetails = props => {
       console.log(err.message, 'XXXXXXXXXXXXXXXXXXxxxx');
     }
   };
-  // console.log(emp);
+  const handleSubmit = async () => {
+    const user = auth().currentUser;
+    const data = {name: user.displayName, date: new Date(), time: addTime};
+    const filnedata = Data.findIndex(
+      n1 => n1.projectId === props.route.params.projectId,
+    );
+    Data[filnedata].work.push(data);
+
+    await firestore()
+      .collection('projects')
+      .doc(props.route.params.projectId)
+      .update({
+        work: Data[filnedata].work,
+      });
+    ToastAndroid.showWithGravityAndOffset(
+      'Successfully Add',
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50,
+    );
+    setAddtime('');
+    dispatch(allProjects(Data));
+    setAddWorkVisible(false);
+  };
+  const callBack = () => {
+    setAddWorkVisible(false);
+    setDateVisible(false);
+  };
+  console.log(Data);
   return (
-    <View style={{flex: 1}}>
-      <View style={{alignItems: 'center', marginVertical: 20}}>
-        <Text
+    <View style={{flex: 1, backgroundColor: '#fff', flexDirection: 'column'}}>
+      <View style={{left: 72, flex: 0.7}}>
+        <Text style={{fontWeight: 'bold', color: 'gray'}}>
+          ID {filterProject[0].projectId}
+        </Text>
+        <View
           style={{
-            fontSize: 25,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            textDecorationLine: 'underline',
-          }}>
-          Project Details
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Project Title :</Text>
-        <Text
+            width: 270,
+            height: 1,
+            borderColor: 'lightgray',
+            borderWidth: 1,
+            marginVertical: 20,
+          }}
+        />
+        <Text style={{fontWeight: 'bold', color: 'gray'}}>ASSIGNED TO</Text>
+        <FlatList
+          data={
+            emparray.length > 0
+              ? filterProject[0].assignTo.length > 0
+                ? filterProject[0].assignTo
+                : ''
+              : ''
+          }
+          style={{marginVertical: 10}}
+          horizontal={true}
+          keyExtractor={item => item.id}
+          renderItem={item => (
+            <View style={{marginHorizontal: 5}}>
+              <Image
+                style={{width: 50, height: 50, borderRadius: 25}}
+                source={{
+                  uri:
+                    emparray.length > 0
+                      ? emparray.find(n1 => n1.id == item.item)?.user.photo
+                      : 'asda',
+                }}
+              />
+            </View>
+          )}
+        />
+        <View
           style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].projectTitle}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>About Project :</Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].disc}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Project Type :</Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].projectType}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Project Cost :</Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].projectCost}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Project ID :</Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].projectId}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-          Expected Time for Delivered :
-        </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            marginTop: 5,
-            marginHorizontal: 10,
-          }}>
-          {filterProject[0].expectedTime}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 10,
-          marginHorizontal: 10,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-          Project Asign to :
-        </Text>
-        {filterProject[0].assignTo.map((item, index) => (
-          <View style={{flexDirection: 'row'}} key={index}>
+            width: 270,
+            height: 1,
+            borderColor: 'lightgray',
+            borderWidth: 1,
+            marginVertical: 20,
+          }}
+        />
+        <View style={{flexDirection: 'row', marginVertical: 10}}>
+          <View style={{flex: 0.4}}>
+            <Text style={{fontWeight: 'bold', color: 'gray'}}>STATUS</Text>
+          </View>
+          <View style={{flex: 0.3, alignItems: 'flex-end'}}>
             <Text
               style={{
-                fontSize: 16,
                 fontWeight: 'bold',
-                marginTop: 5,
-                marginHorizontal: 10,
+                color: 'blue',
               }}>
-              {emp.length > 0
-                ? emp[emp.findIndex(n1 => n1.id == item)].name
-                : ''}
-              ,
+              BACKLOG
             </Text>
           </View>
-        ))}
-      </View>
-      <View style={styles.container}>
-        <Text style={styles.titleText}>Select employee for assign project</Text>
-        <MultiSelect
-          hideTags
-          items={emp}
-          uniqueKey="id"
-          onSelectedItemsChange={onSelectedItemsChange}
-          selectedItems={filterProject[0].assignTo}
-          selectText="Pick Items"
-          searchInputPlaceholderText="Search Items..."
-          onChangeInput={text => console.log(text)}
-          tagRemoveIconColor="#CCC"
-          tagBorderColor="#CCC"
-          tagTextColor="#CCC"
-          selectedItemTextColor="#CCC"
-          selectedItemIconColor="#CCC"
-          itemTextColor="#000"
-          displayKey="name"
-          searchInputStyle={{color: '#CCC'}}
-          submitButtonColor="#48d22b"
-          submitButtonText="Submit"
+        </View>
+        <View
+          style={{
+            width: 270,
+            height: 1,
+            borderColor: 'lightgray',
+            borderWidth: 1,
+            marginVertical: 20,
+          }}
         />
+        <View>
+          <Text style={{fontWeight: 'bold', color: 'gray'}}>DISCRIPTION</Text>
+          <Text style={{fontWeight: 'bold', color: 'gray', marginVertical: 20}}>
+            {filterProject[0].disc}
+          </Text>
+        </View>
+        <View
+          style={{
+            width: 270,
+            height: 1,
+            borderColor: 'lightgray',
+            borderWidth: 1,
+            marginVertical: 20,
+          }}
+        />
+        <View style={{flexDirection: 'row', marginVertical: 10}}>
+          <View style={{flex: 0.4}}>
+            <Text style={{fontWeight: 'bold', color: 'gray'}}>TYPE</Text>
+          </View>
+          <View style={{flex: 0.3, alignItems: 'flex-end'}}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                color: 'blue',
+              }}>
+              {filterProject[0].projectType}
+            </Text>
+          </View>
+        </View>
       </View>
+      <View
+        style={{
+          flex: 0.3,
+          backgroundColor: 'blue',
+          borderTopStartRadius: 50,
+          borderTopEndRadius: 50,
+          marginTop: 40,
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            margin: 30,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <TouchableOpacity onPress={() => setDateVisible(true)}>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>ASSIGNED TO</Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>
+              WORK STATUS{' '}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD WORK</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={dateVisible}
+        onRequestClose={() => {
+          alert('Modal has been closed.');
+          callBack();
+        }}>
+        <View
+          style={
+            (styles.container,
+            {
+              height: 300,
+              backgroundColor: 'lightblue',
+              width: 300,
+              marginTop: 200,
+              marginLeft: 30,
+              borderRadius: 10,
+            })
+          }>
+          <Text style={styles.titleText}>
+            Select employee for assign project
+          </Text>
+          <MultiSelect
+            items={emp}
+            uniqueKey="id"
+            onSelectedItemsChange={onSelectedItemsChange}
+            selectedItems={filterProject[0].assignTo}
+            searchInputPlaceholderText="Search Items..."
+            onChangeInput={text => console.log(text)}
+            tagRemoveIconColor="#CCC"
+            tagBorderColor="#CCC"
+            tagTextColor="#CCC"
+            itemTextColor="#000"
+            displayKey="name"
+            searchInputStyle={{color: '#CCC'}}
+            submitButtonColor="#48d22b"
+            submitButtonText="Submit"
+          />
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 10,
+            }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'green',
+                width: 100,
+                height: 50,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => setDateVisible(false)}>
+              <Text style={{fontWeight: 'bold', color: '#fff'}}>submit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={addWorkVisible}
+        onRequestClose={() => {
+          alert('Modal has been closed.');
+          callBack();
+        }}>
+        <View
+          style={
+            (styles.container,
+            {
+              height: 300,
+              backgroundColor: 'lightblue',
+              width: 300,
+              marginTop: 200,
+              marginLeft: 30,
+              borderRadius: 10,
+            })
+          }>
+          <Text style={styles.titleText}>ADD DAILY WORK HOUR</Text>
+          <TextInput
+            placeholder="Enter in work hour"
+            placeholderTextColor="gray"
+            value={addTime}
+            onChangeText={text => setAddtime(text)}
+            style={{
+              borderBottomWidth: 1,
+              width: 300,
+              marginHorizontal: 10,
+              marginVertical: 10,
+              color: '#000',
+            }}
+          />
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 10,
+            }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'green',
+                width: 100,
+                height: 50,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => handleSubmit()}>
+              <Text style={{fontWeight: 'bold', color: '#fff'}}>submit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
