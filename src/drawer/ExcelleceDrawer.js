@@ -1,19 +1,35 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {View, Text, Pressable, Image, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  ToastAndroid,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
-import Logout from '../components/pages/Logout';
 import AddEmployee from '../components/pages/AddEmpolyee';
 import {useDispatch} from 'react-redux';
+import UserList from '../components/pages/UserList';
+import Report from '../components/pages/Report';
+import {accessToken} from '../redux/Action/Action';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {allEmployee} from '../redux/Action/Action';
-
+import TabNavigation from '../components/TabBar/TabNavigation';
 const Drawer = createDrawerNavigator();
 
 const getIcon = screenName => {
@@ -22,8 +38,10 @@ const getIcon = screenName => {
       return 'home';
     case 'Create Employee':
       return 'person-add';
-    case 'logout':
-      return 'logout';
+    case 'User':
+      return 'people';
+    case 'Report':
+      return 'report';
 
     default:
       return undefined;
@@ -31,7 +49,29 @@ const getIcon = screenName => {
 };
 
 function CustomDrawerContent(props) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
   const Data = auth().currentUser;
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('AceessToken');
+      dispatch(accessToken(null));
+      await GoogleSignin.signOut();
+      ToastAndroid.showWithGravityAndOffset(
+        'Successfully logout',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      ); // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
+    props.navigation.navigate('Login');
+  };
+  const callBack = () => {
+    setModalVisible(false);
+  };
   return (
     <DrawerContentScrollView {...props} safeArea>
       <View>
@@ -84,7 +124,57 @@ function CustomDrawerContent(props) {
             </Pressable>
           ))}
         </View>
+        <View>
+          <Pressable
+            onPress={event => {
+              setModalVisible(true);
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingVertical: 10,
+              }}>
+              <Icon size={30} color="gray" name="logout" />
+              <Text
+                style={{
+                  marginHorizontal: 20,
+                  fontWeight: 'bold',
+                  color: 'gray',
+                }}>
+                Logout
+              </Text>
+            </View>
+          </Pressable>
+        </View>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <View style={styles.modalView}>
+            <Text>Are you sure want to Logout?</Text>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => callBack()}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => handleLogout()}>
+                <Text style={styles.textStyle}>Ok</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </DrawerContentScrollView>
   );
 }
@@ -95,19 +185,62 @@ export default function ExcelleceDrawer({navigation}) {
     const proj = firestore().collection('Empolyee');
     const snapshot = await proj.get();
     snapshot.forEach(doc => {
-      employees.push(doc.data());
+      const data = {...doc.data(), ...{empid: doc.id}};
+      employees.push(data);
     });
     dispatch(allEmployee(employees));
     return () => subscriber();
   }, [navigation]);
   return (
     <View style={{flex: 1}}>
-      <Drawer.Navigator
-        drawerContent={props => <CustomDrawerContent {...props} />}>
-        <Drawer.Screen name="Dashboard" component={Dashboard} />
-        <Drawer.Screen name="Create Employee" component={AddEmployee} />
-        <Drawer.Screen name="logout" component={Logout} />
-      </Drawer.Navigator>
+      <React.Fragment>
+        <Drawer.Navigator
+          drawerContent={props => <CustomDrawerContent {...props} />}>
+          <Drawer.Screen name="Dashboard" component={Dashboard} />
+          <Drawer.Screen name="Create Employee" component={AddEmployee} />
+          <Drawer.Screen name="User" component={UserList} />
+          <Drawer.Screen name="Report" component={Report} />
+        </Drawer.Navigator>
+      </React.Fragment>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 20,
+    marginRight: 20,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
