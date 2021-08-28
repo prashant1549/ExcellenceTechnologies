@@ -118,6 +118,7 @@ const Dashboard = ({navigation}) => {
                   onPress={() =>
                     navigation.navigate('Project Details', {
                       projectId: item.item.projectId,
+                      name: item.item.projectTitle,
                     })
                   }>
                   <Text style={{color: 'blue', fontSize: 20}}>

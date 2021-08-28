@@ -44,7 +44,18 @@ const App = () => {
             />
             <Stack.Screen name="Add Project" component={AddProject} />
             <Stack.Screen name="Profile" component={UserProfile} />
-            <Stack.Screen name="Project Details" component={ProjectDetails} />
+            <Stack.Screen
+              options={({route}) => ({
+                title: route.params.name,
+                headerTintColor: 'green',
+                headerShadowVisible: false,
+                headerStyle: {
+                  backgroundColor: '#fff',
+                },
+              })}
+              name="Project Details"
+              component={ProjectDetails}
+            />
           </>
         )}
       </Stack.Navigator>
