@@ -243,11 +243,11 @@ const ProjectDetails = props => {
               })
             }>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>
-              WORK STATUS{' '}
+              PROJECT STATUS{' '}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD WORK</Text>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD LOG</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -314,6 +314,7 @@ const ProjectDetails = props => {
       <Modal
         animationType="slide"
         transparent={true}
+        onTouchCancel={() => setDateVisible(false)}
         visible={addWorkVisible}
         onRequestClose={() => {
           alert('Modal has been closed.');
@@ -337,6 +338,8 @@ const ProjectDetails = props => {
             placeholderTextColor="gray"
             value={addTime}
             onChangeText={text => setAddtime(text)}
+            keyboardType="number-pad"
+            keyExtractor
             style={{
               borderBottomWidth: 1,
               width: 300,
