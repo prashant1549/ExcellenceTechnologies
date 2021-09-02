@@ -1,26 +1,9 @@
 import {createStore, combineReducers, applyMiddleware, compose} from 'redux';
-import LoginUser from './Reducer/LoginReducer';
-import SignupUser from './Reducer/SignupReducer';
 import Project from './Reducer/ProjectReducer';
-import Poll from './Reducer/PollReducer';
-import singlePoll from './Reducer/SignlePollReduce';
-import Vote from './Reducer/VoteReducer';
-import createSagaMiddleware from 'redux-saga';
-import {watcherSaga} from './sagas/rootSaga';
-const sagaMiddleware = createSagaMiddleware();
 
 const rootReducer = combineReducers({
-  user: LoginUser,
-  signupUser: SignupUser,
-  poll: Poll,
-  singlePoll: singlePoll,
-  vote: Vote,
   ProjectReducer: Project,
 });
 
-const store = createStore(
-  rootReducer,
-  compose(applyMiddleware(sagaMiddleware)),
-);
-sagaMiddleware.run(watcherSaga);
+const store = createStore(rootReducer);
 export default store;

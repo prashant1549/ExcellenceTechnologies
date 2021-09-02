@@ -17,10 +17,10 @@ import {
 } from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
 import AddEmployee from '../components/pages/AddEmpolyee';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import UserList from '../components/pages/UserList';
 import Report from '../components/pages/Report';
-import {accessToken} from '../redux/Action/Action';
+import {accessToken, userProfile} from '../redux/Action/Action';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   GoogleSignin,
@@ -29,7 +29,6 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {allEmployee} from '../redux/Action/Action';
-import TabNavigation from '../components/TabBar/TabNavigation';
 const Drawer = createDrawerNavigator();
 
 const getIcon = screenName => {
@@ -51,11 +50,12 @@ const getIcon = screenName => {
 function CustomDrawerContent(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const Data = auth().currentUser;
+  const currentUser = useSelector(state => state.ProjectReducer.user);
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('AceessToken');
       dispatch(accessToken(null));
+      dispatch(userProfile({}));
       await GoogleSignin.signOut();
       ToastAndroid.showWithGravityAndOffset(
         'Successfully logout',
@@ -81,12 +81,16 @@ function CustomDrawerContent(props) {
             onPress={() => props.navigation.navigate('Profile')}>
             <Image
               style={{width: 60, height: 60, borderRadius: 30}}
-              source={{uri: Data.photoURL}}
+              source={
+                currentUser.photo == ''
+                  ? require('../assets/avtar.png')
+                  : {uri: currentUser?.photo}
+              }
             />
           </TouchableOpacity>
 
           <Text style={{fontSize: 12, color: 'gray', fontWeight: 'bold'}}>
-            {Data.email}
+            {currentUser?.email}
           </Text>
         </View>
         <View
@@ -180,6 +184,7 @@ function CustomDrawerContent(props) {
 }
 export default function ExcelleceDrawer({navigation}) {
   const dispatch = useDispatch();
+  const currentUser = useSelector(state => state.ProjectReducer.user);
   useEffect(async () => {
     const employees = [];
     const proj = firestore().collection('Empolyee');
@@ -194,13 +199,20 @@ export default function ExcelleceDrawer({navigation}) {
   return (
     <View style={{flex: 1}}>
       <React.Fragment>
-        <Drawer.Navigator
-          drawerContent={props => <CustomDrawerContent {...props} />}>
-          <Drawer.Screen name="Dashboard" component={Dashboard} />
-          <Drawer.Screen name="Create Employee" component={AddEmployee} />
-          <Drawer.Screen name="User" component={UserList} />
-          <Drawer.Screen name="Report" component={Report} />
-        </Drawer.Navigator>
+        {currentUser?.role === 'admin' ? (
+          <Drawer.Navigator
+            drawerContent={props => <CustomDrawerContent {...props} />}>
+            <Drawer.Screen name="Dashboard" component={Dashboard} />
+            <Drawer.Screen name="Create Employee" component={AddEmployee} />
+            <Drawer.Screen name="User" component={UserList} />
+            <Drawer.Screen name="Report" component={Report} />
+          </Drawer.Navigator>
+        ) : (
+          <Drawer.Navigator
+            drawerContent={props => <CustomDrawerContent {...props} />}>
+            <Drawer.Screen name="Dashboard" component={Dashboard} />
+          </Drawer.Navigator>
+        )}
       </React.Fragment>
     </View>
   );

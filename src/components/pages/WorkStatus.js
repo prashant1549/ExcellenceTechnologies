@@ -1,58 +1,74 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, Modal} from 'react-native';
 import {useSelector} from 'react-redux';
 import moment from 'moment';
 import {Calendar} from 'react-native-calendars';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const WorkStatus = props => {
-  const [dateVisible, setDateVisible] = useState(false);
-  const [selectDate, setSelectDate] = useState('');
+  const [month, setMonth] = useState(0);
   const Data = useSelector(state => state.ProjectReducer.project);
   const filterProject = Data.find(
     item => item.projectId === props.route.params.projectId,
   );
-  const presentTime = moment(new Date(selectDate));
-  console.log(moment(presentTime, 'YYYY/MM/DD').format('M'));
 
-  const currentDate = moment(filterProject.createdAt?.toDate()).format(
-    'yyyy-MM-DD',
-  );
+  useEffect(() => {
+    const currentDate = moment(filterProject.createdAt?.toDate()).format('M');
+    setMonth(currentDate);
+  }, []);
   const workData = [...filterProject.work];
-  const filetdata =
-    selectDate != ''
-      ? workData.filter(
-          n1 =>
-            moment(n1.date?.toDate(), 'YYYY/MM/DD').format('M') ==
-            moment(presentTime, 'YYYY/MM/DD').format('M'),
-        )
-      : workData;
-  console.log(workData);
-  const currentDate1 = moment(new Date()).format('yyyy-MM-DD');
-  const handleDate1 = () => {
-    setDateVisible(true);
+  const filetdata = workData.filter(
+    n1 => moment(n1.date?.toDate(), 'YYYY/MM/DD').format('M') == month,
+  );
+
+  const getMonth = month => {
+    switch (month) {
+      case 1:
+        return 'January';
+      case 2:
+        return 'Febuary';
+      case 3:
+        return 'March';
+      case 4:
+        return 'April';
+      case 5:
+        return 'May';
+      case 6:
+        return 'June';
+      case 7:
+        return 'July';
+      case 8:
+        return 'August';
+      case 9:
+        return 'September';
+      case 10:
+        return 'October';
+      case 11:
+        return 'November';
+      case 12:
+        return 'December';
+
+      default:
+        return undefined;
+    }
   };
-  const handlePickDate = day => {
-    console.log(day);
-    setSelectDate(day.dateString);
-    setDateVisible(false);
-  };
-  // console.log(currentDate);
   return (
     <>
-      <View style={{flexDirection: 'row-reverse'}}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: 'lightblue',
-            width: 120,
-            height: 35,
-            borderRadius: 10,
-            justifyContent: 'center',
-            marginHorizontal: 20,
-          }}
-          onPress={handleDate1}>
-          <Text style={{textAlign: 'center'}}>
-            {selectDate == '' ? 'Select Date' : selectDate}
-          </Text>
+      <View
+        style={{
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+          marginVertical: 10,
+          marginHorizontal: 10,
+        }}>
+        <TouchableOpacity onPress={() => setMonth(month => month - 1)}>
+          <Icon name="arrow-back" size={30} />
+        </TouchableOpacity>
+        <Text style={{fontSize: 20, color: 'green'}}>
+          {getMonth(parseInt(month))}
+        </Text>
+        <TouchableOpacity onPress={() => setMonth(month => month + 1)}>
+          <Icon name="arrow-forward" size={30} />
         </TouchableOpacity>
       </View>
       {filetdata.length > 0 ? (
@@ -87,40 +103,6 @@ const WorkStatus = props => {
           <Text>sorry !! this month data not available</Text>
         </View>
       )}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={dateVisible}
-        onTouchCancel={() => {
-          setDateVisible(false);
-        }}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setDateVisible(false);
-        }}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Calendar
-            current={currentDate}
-            minDate={currentDate}
-            onDayPress={day => {
-              return handlePickDate(day);
-            }}
-            onDayLongPress={day => {
-              return handlePickDate(day);
-            }}
-            monthFormat={'MM yyyy'}
-            disableAllTouchEventsForDisabledDays={true}
-            renderHeader={date => {
-              return (
-                <View key={date}>
-                  <Text>{date.toString('MMM yyyy')}</Text>
-                </View>
-              );
-            }}
-            enableSwipeMonths={true}
-          />
-        </View>
-      </Modal>
     </>
   );
 };

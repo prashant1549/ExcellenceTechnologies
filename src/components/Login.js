@@ -29,34 +29,40 @@ export default function Login({navigation}) {
       const user = await auth().currentUser;
       const proj = firestore().collection('Empolyee');
       const snapshot = await proj.get();
-      snapshot.forEach(doc => {
-        if (doc.id === user.uid) {
-          const d1 = {
-            ...userInfo.user,
-            ...{role: doc.data().role, projects: doc.data().projects},
-          };
-          firestore().collection('Empolyee').doc(user.uid).set(d1);
-          dispatch(userProfile(d1));
+      snapshot.forEach(async doc => {
+        if (userInfo.user.email === doc.data().email) {
+          if (doc.data().isActive === true) {
+            const data = {...doc.data(), ...{empid: doc.id}};
+            await AsyncStorage.setItem('AceessToken', userInfo.idToken);
+            await AsyncStorage.setItem('UserProfile', JSON.stringify(data));
+            dispatch(accessToken(userInfo.idToken));
+            dispatch(userProfile(data));
+            ToastAndroid.showWithGravityAndOffset(
+              'successfully login',
+              ToastAndroid.LONG,
+              ToastAndroid.BOTTOM,
+              25,
+              50,
+            );
+          } else {
+            ToastAndroid.showWithGravityAndOffset(
+              'Sorry !! You are not eligible ',
+              ToastAndroid.LONG,
+              ToastAndroid.BOTTOM,
+              25,
+              50,
+            );
+          }
         } else {
-          const d2 = {
-            ...userInfo.user,
-            ...{role: 'empolyee', projects: []},
-          };
-          firestore().collection('Empolyee').doc(user.uid).set(d2);
-          dispatch(userProfile(d2));
+          ToastAndroid.showWithGravityAndOffset(
+            'Sorry !! You are not eligible ',
+            ToastAndroid.LONG,
+            ToastAndroid.BOTTOM,
+            25,
+            50,
+          );
         }
       });
-
-      await AsyncStorage.setItem('AceessToken', userInfo.idToken);
-      dispatch(accessToken(userInfo.idToken));
-
-      ToastAndroid.showWithGravityAndOffset(
-        'Successfully login',
-        ToastAndroid.LONG,
-        ToastAndroid.BOTTOM,
-        25,
-        50,
-      );
 
       const googleCredential = auth.GoogleAuthProvider.credential(
         userInfo.idToken,

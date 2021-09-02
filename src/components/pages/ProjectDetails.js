@@ -24,6 +24,7 @@ const ProjectDetails = props => {
   const [emparray, setEmpArray] = useState([]);
   const [addTime, setAddtime] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
+  const currentUser = useSelector(state => state.ProjectReducer.user);
   const Data = useSelector(state => state.ProjectReducer.project);
   const filterProject = Data.filter(
     item => item.projectId === props.route.params.projectId,
@@ -115,8 +116,15 @@ const ProjectDetails = props => {
       25,
       50,
     );
+    const projects = [];
+    const proj = firestore().collection('projects');
+    const snapshot = await proj.get();
+    snapshot.forEach(doc => {
+      const data = {...doc.data(), ...{projectId: doc.id}};
+      projects.push(data);
+    });
+    dispatch(allProjects(projects));
     setAddtime('');
-    dispatch(allProjects(Data));
     setAddWorkVisible(false);
   };
   const callBack = () => {
@@ -143,31 +151,36 @@ const ProjectDetails = props => {
             <View style={{marginHorizontal: 5}}>
               <Image
                 style={{width: 50, height: 50, borderRadius: 25}}
-                source={{
-                  uri:
-                    emparray.length > 0
-                      ? emparray.find(n1 => n1.id == item.item)?.user.photo
-                      : 'asda',
-                }}
+                source={
+                  emparray?.find(n1 => n1.id == item.item)?.user.photo == ''
+                    ? require('../../assets/avtar.png')
+                    : {uri: emparray.find(n1 => n1.id == item.item)?.user.photo}
+                }
               />
             </View>
           )}
         />
 
-        <View style={{flexDirection: 'row', top: -20}}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: 'blue',
-              width: 130,
-              height: 50,
-              borderRadius: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={() => setDateVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ASSIGNED TO</Text>
-          </TouchableOpacity>
-        </View>
+        {currentUser?.role === 'admin' ? (
+          <View style={{flexDirection: 'row', top: -20}}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'blue',
+                width: 130,
+                height: 50,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => setDateVisible(true)}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                ASSIGNED TO
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View />
+        )}
         <View
           style={{
             width: 350,
@@ -230,26 +243,30 @@ const ProjectDetails = props => {
           marginTop: 40,
           justifyContent: 'center',
         }}>
-        <View
-          style={{
-            margin: 30,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate('Work Status', {
-                projectId: props.route.params.projectId,
-              })
-            }>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>
-              PROJECT STATUS{' '}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD LOG</Text>
-          </TouchableOpacity>
-        </View>
+        {filterProject[0]?.projectType === 'Hourly' ? (
+          <View
+            style={{
+              margin: 30,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate('Work Status', {
+                  projectId: props.route.params.projectId,
+                })
+              }>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                PROJECT STATUS{' '}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD LOG</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
       <Modal
         animationType="slide"

@@ -13,7 +13,6 @@ const Report = ({navigation}) => {
           (Data[i].work.length > 0
             ? Data[i].work.reduce((n1, n2) => n1 + parseInt(n2.time), 0)
             : 0);
-      console.log(totale);
     }
     setPrice(totale);
   }, []);
@@ -45,7 +44,7 @@ const Report = ({navigation}) => {
               flex: 1,
             }}>
             <Text style={{flex: 0.3}}>{item.item.projectTitle}</Text>
-            <Text style={{flex: 0.2}}>{item.item.projectCost}</Text>
+            <Text style={{flex: 0.2}}>{item.item.projectCost}$</Text>
             <Text style={{flex: 0.2}}>
               {item.item.work.length > 0
                 ? item.item.work.reduce((n1, n2) => n1 + parseInt(n2.time), 0)
@@ -57,6 +56,7 @@ const Report = ({navigation}) => {
                 (item.item.work.length > 0
                   ? item.item.work.reduce((n1, n2) => n1 + parseInt(n2.time), 0)
                   : 0)}
+              $
             </Text>
           </View>
         )}
@@ -67,7 +67,7 @@ const Report = ({navigation}) => {
       <View style={{flexDirection: 'row-reverse'}}>
         <View style={{flexDirection: 'row', marginRight: 50}}>
           <Text style={{fontWeight: 'bold', marginHorizontal: 20}}>
-            TOTALE PRICE ={' '}
+            TOTALE PRICE = $
           </Text>
           <Text>{totleprice}</Text>
         </View>
