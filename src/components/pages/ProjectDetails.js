@@ -126,19 +126,7 @@ const ProjectDetails = props => {
   console.log(Data);
   return (
     <View style={{flex: 1, backgroundColor: '#fff', flexDirection: 'column'}}>
-      <View style={{left: 72, flex: 0.7}}>
-        <Text style={{fontWeight: 'bold', color: 'gray'}}>
-          ID {filterProject[0].projectId}
-        </Text>
-        <View
-          style={{
-            width: 270,
-            height: 1,
-            borderColor: 'lightgray',
-            borderWidth: 1,
-            marginVertical: 20,
-          }}
-        />
+      <View style={{left: 10, flex: 0.7}}>
         <Text style={{fontWeight: 'bold', color: 'gray'}}>ASSIGNED TO</Text>
         <FlatList
           data={
@@ -150,7 +138,7 @@ const ProjectDetails = props => {
           }
           style={{marginVertical: 10}}
           horizontal={true}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index}
           renderItem={item => (
             <View style={{marginHorizontal: 5}}>
               <Image
@@ -165,32 +153,24 @@ const ProjectDetails = props => {
             </View>
           )}
         />
-        <View
-          style={{
-            width: 270,
-            height: 1,
-            borderColor: 'lightgray',
-            borderWidth: 1,
-            marginVertical: 20,
-          }}
-        />
-        <View style={{flexDirection: 'row', marginVertical: 10}}>
-          <View style={{flex: 0.4}}>
-            <Text style={{fontWeight: 'bold', color: 'gray'}}>STATUS</Text>
-          </View>
-          <View style={{flex: 0.3, alignItems: 'flex-end'}}>
-            <Text
-              style={{
-                fontWeight: 'bold',
-                color: 'blue',
-              }}>
-              BACKLOG
-            </Text>
-          </View>
+
+        <View style={{flexDirection: 'row', top: -20}}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: 'blue',
+              width: 130,
+              height: 50,
+              borderRadius: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onPress={() => setDateVisible(true)}>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>ASSIGNED TO</Text>
+          </TouchableOpacity>
         </View>
         <View
           style={{
-            width: 270,
+            width: 350,
             height: 1,
             borderColor: 'lightgray',
             borderWidth: 1,
@@ -205,13 +185,27 @@ const ProjectDetails = props => {
         </View>
         <View
           style={{
-            width: 270,
+            width: 350,
             height: 1,
             borderColor: 'lightgray',
             borderWidth: 1,
             marginVertical: 20,
           }}
         />
+        <View style={{flexDirection: 'row', marginVertical: 10}}>
+          <View style={{flex: 0.4}}>
+            <Text style={{fontWeight: 'bold', color: 'gray'}}>TYPE</Text>
+          </View>
+          <View style={{flex: 0.3, alignItems: 'flex-end'}}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                color: 'blue',
+              }}>
+              {filterProject[0].projectType}
+            </Text>
+          </View>
+        </View>
         <View style={{flexDirection: 'row', marginVertical: 10}}>
           <View style={{flex: 0.4}}>
             <Text style={{fontWeight: 'bold', color: 'gray'}}>TYPE</Text>
@@ -242,16 +236,18 @@ const ProjectDetails = props => {
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}>
-          <TouchableOpacity onPress={() => setDateVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ASSIGNED TO</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              props.navigation.navigate('Work Status', {
+                projectId: props.route.params.projectId,
+              })
+            }>
             <Text style={{color: '#fff', fontWeight: 'bold'}}>
-              WORK STATUS{' '}
+              PROJECT STATUS{' '}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD WORK</Text>
+            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD LOG</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -318,6 +314,7 @@ const ProjectDetails = props => {
       <Modal
         animationType="slide"
         transparent={true}
+        onTouchCancel={() => setDateVisible(false)}
         visible={addWorkVisible}
         onRequestClose={() => {
           alert('Modal has been closed.');
@@ -341,6 +338,8 @@ const ProjectDetails = props => {
             placeholderTextColor="gray"
             value={addTime}
             onChangeText={text => setAddtime(text)}
+            keyboardType="number-pad"
+            keyExtractor
             style={{
               borderBottomWidth: 1,
               width: 300,

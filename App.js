@@ -10,6 +10,7 @@ import ExcelleceDrawer from './src/drawer/ExcelleceDrawer';
 import AddProject from './src/components/pages/AddProject';
 import UserProfile from './src/components/pages/UserProfile';
 import ProjectDetails from './src/components/pages/ProjectDetails';
+import WorkStatus from './src/components/pages/WorkStatus';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -44,6 +45,7 @@ const App = () => {
             />
             <Stack.Screen name="Add Project" component={AddProject} />
             <Stack.Screen name="Profile" component={UserProfile} />
+            <Stack.Screen name="Work Status" component={WorkStatus} />
             <Stack.Screen
               options={({route}) => ({
                 title: route.params.name,

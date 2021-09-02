@@ -29,6 +29,9 @@ const AddProject = ({navigation}) => {
     projectCost: '',
     projectType: '',
     expectedTime: '',
+    createdAt: '',
+    work: [],
+    assignedTo: [],
   });
   const currentDate = moment(new Date()).format('yyyy-MM-DD');
   const data = [
@@ -62,6 +65,7 @@ const AddProject = ({navigation}) => {
       );
     } else {
       project.id = Math.floor(Math.random() * 1000 + 1);
+      project.createdAt = currentDate;
       dispatch(createProject(project));
       const usersCollection = firestore().collection('projects').add(project);
 
@@ -89,7 +93,6 @@ const AddProject = ({navigation}) => {
     data[value] = text;
     setProject(data);
   };
-  console.log(Object.values(project).length);
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{alignItems: 'center', marginVertical: 20}}>
