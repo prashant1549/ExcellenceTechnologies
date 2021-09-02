@@ -1,16 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View, Text, TouchableOpacity, Modal, FlatList} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {allProjects} from '../../redux/Action/Action';
 import firestore from '@react-native-firebase/firestore';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import ReactNativeTooltipMenu from 'react-native-tooltip-menu';
-import TabNavigation from '../TabBar/TabNavigation';
 
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
-  const ref = useRef(null);
-  const [modalVisible, setModalVisible] = useState(false);
   useEffect(async () => {
     const projects = [];
     const proj = firestore().collection('projects');
@@ -26,20 +21,29 @@ const Dashboard = ({navigation}) => {
   const Data = useSelector(state => state.ProjectReducer.project);
   return (
     <View style={{flex: 1}}>
+      <View style={{flex: 1, flexDirection: 'row-reverse'}}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Add Project')}
+          style={{
+            width: 150,
+            height: 50,
+            backgroundColor: 'lightblue',
+            borderRadius: 10,
+            margin: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{fontWeight: 'bold', fontSize: 20}}>Add Project</Text>
+        </TouchableOpacity>
+      </View>
       <View style={{flex: 5}}>
         <FlatList
           data={Data.length > 0 ? Data : ''}
           keyExtractor={item => item.id}
           renderItem={item => (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('Project Details', {
-                  projectId: item.item.projectId,
-                  name: item.item.projectTitle,
-                })
-              }
+            <View
               style={{
-                height: 120,
+                height: 225,
                 marginVertical: 10,
                 alignSelf: 'center',
                 backgroundColor: '#FFFFFF',
@@ -59,22 +63,20 @@ const Dashboard = ({navigation}) => {
               </View>
               <View
                 style={{
-                  width: 350,
+                  width: 300,
                   height: 1,
                   borderWidth: 1,
                   borderColor: 'gray',
                 }}
               />
               <View>
-                <View style={{flexDirection: 'row'}}>
-                  <Text
-                    style={{fontWeight: 'bold', fontSize: 18, marginLeft: 10}}>
-                    About :
-                  </Text>
-                  <Text numberOfLines={1} style={{margin: 5}}>
-                    {item.item.disc}{' '}
-                  </Text>
-                </View>
+                <Text
+                  style={{fontWeight: 'bold', fontSize: 18, marginLeft: 10}}>
+                  About :
+                </Text>
+                <Text numberOfLines={1} style={{marginLeft: 25}}>
+                  {item.item.disc}{' '}
+                </Text>
                 <Text
                   numberOfLines={1}
                   style={{
@@ -85,66 +87,48 @@ const Dashboard = ({navigation}) => {
                   }}>
                   Project Type : {item.item.projectType}{' '}
                 </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    marginHorizontal: 10,
+                    marginVertical: 2,
+                  }}>
+                  Project cost : {item.item.projectCost}{' '}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                    marginHorizontal: 10,
+                    marginVertical: 2,
+                  }}>
+                  Expected Time : {item.item.expectedTime}{' '}
+                </Text>
               </View>
-            </TouchableOpacity>
-          )}
-        />
-        <View style={{flexDirection: 'row-reverse'}}>
-          <ReactNativeTooltipMenu
-            buttonComponent={
-              // <View style={{flexDirection: 'row-reverse', zIndex: 2, flex: 1}}>
               <View
                 style={{
-                  width: 70,
-                  height: 70,
-                  backgroundColor: 'red',
-                  borderRadius: 35,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  flexDirection: 'row-reverse',
+                  marginHorizontal: 10,
+                  marginVertical: 10,
                 }}>
-                <Icon size={40} name="add" color="#fff" />
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Project Details', {
+                      projectId: item.item.projectId,
+                      name: item.item.projectTitle,
+                    })
+                  }>
+                  <Text style={{color: 'blue', fontSize: 20}}>
+                    View Details
+                  </Text>
+                </TouchableOpacity>
               </View>
-              // </View>
-            }
-            items={[
-              {
-                label: 'Create',
-                onPress: () => console.log('asknklanskl'),
-              },
-              {
-                label: 'Add',
-                onPress: () => console.log('asknklanskl'),
-              },
-            ]}
-          />
-        </View>
-      </View>
-      <View
-        style={{
-          flex: 0.6,
-          backgroundColor: 'lightblue',
-          justifyContent: 'center',
-        }}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-          <TouchableOpacity
-            style={{alignItems: 'center'}}
-            onPress={() => navigation.navigate('Dashboard')}>
-            <Icon size={30} color="#000" name="list" />
-            <Text style={{fontSize: 16, fontWeight: 'bold'}}>PROJECTS</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{alignItems: 'center'}}
-            onPress={() => navigation.navigate('User')}>
-            <Icon size={30} color="#000" name="people" />
-            <Text style={{fontSize: 16, fontWeight: 'bold'}}>USER</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{alignItems: 'center'}}
-            onPress={() => navigation.navigate('Report')}>
-            <Icon size={30} color="#000" name="report" />
-            <Text style={{fontSize: 16, fontWeight: 'bold'}}>REPORT</Text>
-          </TouchableOpacity>
-        </View>
+            </View>
+          )}
+        />
       </View>
     </View>
   );
