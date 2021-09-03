@@ -72,7 +72,9 @@ const Dashboard = ({navigation}) => {
                 <View style={{flex: 1, flexDirection: 'row-reverse'}}>
                   <View style={{justifyContent: 'flex-end'}}>
                     <FlatList
-                      data={item.item.assignTo ? item.item.assignTo : ''}
+                      data={
+                        item.item.assignTo?.length > 0 ? item.item.assignTo : ''
+                      }
                       horizontal={true}
                       keyExtractor={(item, index) => index}
                       renderItem={item => (
@@ -104,20 +106,24 @@ const Dashboard = ({navigation}) => {
             </LinearGradient>
           )}
         />
-        <View style={{flexDirection: 'row-reverse'}}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Add Project')}
-            style={{
-              width: 70,
-              height: 70,
-              backgroundColor: 'red',
-              borderRadius: 35,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Icon size={40} name="add" color="#fff" />
-          </TouchableOpacity>
-        </View>
+        {currentUser?.role === 'admin' ? (
+          <View style={{flexDirection: 'row-reverse'}}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Add Project')}
+              style={{
+                width: 70,
+                height: 70,
+                backgroundColor: 'red',
+                borderRadius: 35,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Icon size={40} name="add" color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
       {currentUser?.role === 'admin' ? (
         <View

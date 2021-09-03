@@ -30,7 +30,7 @@ export default function Login({navigation}) {
       const proj = firestore().collection('Empolyee');
       const snapshot = await proj.get();
       snapshot.forEach(async doc => {
-        if (userInfo.user.email === doc.data().email) {
+        if (userInfo?.user?.email === doc?.data()?.email) {
           if (doc.data().isActive === true) {
             const data = {...doc.data(), ...{empid: doc.id}};
             await AsyncStorage.setItem('AceessToken', userInfo.idToken);
@@ -45,22 +45,15 @@ export default function Login({navigation}) {
               50,
             );
           } else {
+            await GoogleSignin.signOut();
             ToastAndroid.showWithGravityAndOffset(
-              'Sorry !! You are not eligible ',
+              'Sorry !! You are not allowed for login ',
               ToastAndroid.LONG,
               ToastAndroid.BOTTOM,
               25,
               50,
             );
           }
-        } else {
-          ToastAndroid.showWithGravityAndOffset(
-            'Sorry !! You are not eligible ',
-            ToastAndroid.LONG,
-            ToastAndroid.BOTTOM,
-            25,
-            50,
-          );
         }
       });
 
