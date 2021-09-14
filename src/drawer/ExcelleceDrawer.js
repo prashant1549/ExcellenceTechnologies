@@ -49,6 +49,7 @@ const getIcon = screenName => {
 
 function CustomDrawerContent(props) {
   const [modalVisible, setModalVisible] = useState(false);
+  console.log('updatedCode');
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
   const handleLogout = async () => {
