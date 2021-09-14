@@ -21,6 +21,7 @@ const WorkStatus = props => {
     n1 => moment(n1.date?.toDate(), 'YYYY/MM/DD').format('M') == month,
   );
 
+  console.log(month);
   const getMonth = month => {
     switch (month) {
       case 1:
@@ -61,13 +62,15 @@ const WorkStatus = props => {
           marginVertical: 10,
           marginHorizontal: 10,
         }}>
-        <TouchableOpacity onPress={() => setMonth(month => month - 1)}>
+        <TouchableOpacity
+          onPress={() => setMonth(month => parseInt(month) - 1)}>
           <Icon name="arrow-back" size={30} />
         </TouchableOpacity>
         <Text style={{fontSize: 20, color: 'green'}}>
           {getMonth(parseInt(month))}
         </Text>
-        <TouchableOpacity onPress={() => setMonth(month => month + 1)}>
+        <TouchableOpacity
+          onPress={() => setMonth(month => parseInt(month) + 1)}>
           <Icon name="arrow-forward" size={30} />
         </TouchableOpacity>
       </View>

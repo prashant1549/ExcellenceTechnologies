@@ -9,20 +9,23 @@ import LinearGradient from 'react-native-linear-gradient';
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
   useEffect(async () => {
-    const projects = [];
-    const proj = firestore().collection('projects');
-    const snapshot = await proj.get();
-    snapshot.forEach(doc => {
-      const data = {...doc.data(), ...{projectId: doc.id}};
-      projects.push(data);
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const projects = [];
+      const proj = firestore().collection('projects');
+      const snapshot = await proj.get();
+      snapshot.forEach(doc => {
+        const data = {...doc.data(), ...{projectId: doc.id}};
+        projects.push(data);
+      });
+      dispatch(allProjects(projects));
     });
-    dispatch(allProjects(projects));
-    return () => subscriber();
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   const Data = useSelector(state => state.ProjectReducer.project);
   const user = useSelector(state => state.ProjectReducer.employees);
   const currentUser = useSelector(state => state.ProjectReducer.user);
+  console.log(Data);
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 5}}>
@@ -83,7 +86,7 @@ const Dashboard = ({navigation}) => {
                           <Image
                             style={{width: 50, height: 50, borderRadius: 25}}
                             source={
-                              user.length > 0
+                              user?.length > 0
                                 ? user.find(n1 => n1.empid == item.item)
                                     ?.photo == ''
                                   ? require('../../assets/avtar.png')
@@ -92,7 +95,7 @@ const Dashboard = ({navigation}) => {
                                         n1 => n1.empid == item.item,
                                       )?.photo,
                                     }
-                                : 'ajnsjkan'
+                                : require('../../assets/avtar.png')
                             }
                           />
                         </View>

@@ -11,7 +11,7 @@ const initialState = {
   project: [],
   user: {},
   employees: [],
-  token: {},
+  token: null,
 };
 
 export default (state = initialState, action) => {

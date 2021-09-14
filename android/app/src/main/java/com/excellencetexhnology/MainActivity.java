@@ -1,4 +1,4 @@
-package com.excellencetexhnology;
+package com.excellencetechnology;
 
 import com.facebook.react.ReactActivity;
 import android.os.Bundle;
@@ -15,6 +15,6 @@ protected void onCreate(Bundle savedInstanceState) {
 }
   @Override
   protected String getMainComponentName() {
-    return "ExcellenceTexhnology";
+    return "excellencetechnology";
   }
 }

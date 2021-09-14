@@ -131,7 +131,6 @@ const ProjectDetails = props => {
     setAddWorkVisible(false);
     setDateVisible(false);
   };
-  console.log(Data);
   return (
     <View style={{flex: 1, backgroundColor: '#fff', flexDirection: 'column'}}>
       <View style={{left: 72, flex: 0.7}}>

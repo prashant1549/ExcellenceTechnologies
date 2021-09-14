@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1099311539417:android:84475b2e307f1d25e70ac8",
+        "mobilesdk_app_id": "1:1099311539417:android:daa7f394e774385ce70ac8",
         "android_client_info": {
-          "package_name": "com.excellencetexhnology"
+          "package_name": "com.excellencetechnology"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1099311539417-o5ujsr0v1srfgsm881tn22biu65pcsm6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.excellencetechnology",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
         {
           "client_id": "1099311539417-78vkcbg64kssqhfr0iv9vtfd23magbi8.apps.googleusercontent.com",
           "client_type": 3

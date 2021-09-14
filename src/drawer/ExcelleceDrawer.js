@@ -49,9 +49,9 @@ const getIcon = screenName => {
 
 function CustomDrawerContent(props) {
   const [modalVisible, setModalVisible] = useState(false);
-  console.log('updatedCode');
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
+  console.log(currentUser?.photo, 'updatedCode');
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('AceessToken');
@@ -83,7 +83,7 @@ function CustomDrawerContent(props) {
             <Image
               style={{width: 60, height: 60, borderRadius: 30}}
               source={
-                currentUser.photo == ''
+                currentUser?.photo == ''
                   ? require('../assets/avtar.png')
                   : {uri: currentUser?.photo}
               }
@@ -186,7 +186,6 @@ function CustomDrawerContent(props) {
 export default function ExcelleceDrawer({navigation}) {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
-  console.log(currentUser);
   useEffect(async () => {
     const employees = [];
     const proj = firestore().collection('Empolyee');
