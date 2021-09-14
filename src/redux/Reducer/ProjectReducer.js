@@ -4,10 +4,7 @@ import {
   USER_PROFILE,
   CREATE_EMPLOYEE,
   ALL_EMPLOYEE,
-<<<<<<< HEAD
-=======
   CURRENT_USER,
->>>>>>> master
   ACCESS_TOKEN,
 } from '../Action/Type';
 
@@ -15,12 +12,8 @@ const initialState = {
   project: [],
   user: {},
   employees: [],
-<<<<<<< HEAD
-  token: {},
-=======
   currentUser: {},
   token: null,
->>>>>>> master
 };
 
 export default (state = initialState, action) => {

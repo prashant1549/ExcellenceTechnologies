@@ -9,7 +9,6 @@ import {View, Text, Pressable, Image, TouchableOpacity} from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
 import Logout from '../components/pages/Logout';
 import AddEmployee from '../components/pages/AddEmpolyee';
-<<<<<<< HEAD
 import {useDispatch, useSelector} from 'react-redux';
 import UserList from '../components/pages/UserList';
 import Report from '../components/pages/Report';
@@ -22,13 +21,6 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {allEmployee} from '../redux/Action/Action';
-=======
-import {useDispatch} from 'react-redux';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import {allEmployee} from '../redux/Action/Action';
-
->>>>>>> 623e39709bb3fe1a8806bcfa9d164e84329b3855
 const Drawer = createDrawerNavigator();
 
 const getIcon = screenName => {
@@ -46,7 +38,6 @@ const getIcon = screenName => {
 };
 
 function CustomDrawerContent(props) {
-<<<<<<< HEAD
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
@@ -73,9 +64,6 @@ function CustomDrawerContent(props) {
   const callBack = () => {
     setModalVisible(false);
   };
-=======
-  const Data = auth().currentUser;
->>>>>>> 623e39709bb3fe1a8806bcfa9d164e84329b3855
   return (
     <DrawerContentScrollView {...props} safeArea>
       <View>
@@ -151,7 +139,6 @@ export default function ExcelleceDrawer({navigation}) {
   }, [navigation]);
   return (
     <View style={{flex: 1}}>
-<<<<<<< HEAD
       <React.Fragment>
         {currentUser?.role === 'admin' ? (
           <Drawer.Navigator
@@ -168,14 +155,6 @@ export default function ExcelleceDrawer({navigation}) {
           </Drawer.Navigator>
         )}
       </React.Fragment>
-=======
-      <Drawer.Navigator
-        drawerContent={props => <CustomDrawerContent {...props} />}>
-        <Drawer.Screen name="Dashboard" component={Dashboard} />
-        <Drawer.Screen name="Create Employee" component={AddEmployee} />
-        <Drawer.Screen name="logout" component={Logout} />
-      </Drawer.Navigator>
->>>>>>> 623e39709bb3fe1a8806bcfa9d164e84329b3855
     </View>
   );
 }
