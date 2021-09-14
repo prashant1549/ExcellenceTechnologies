@@ -186,6 +186,7 @@ function CustomDrawerContent(props) {
 export default function ExcelleceDrawer({navigation}) {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
+  console.log(currentUser);
   useEffect(async () => {
     const employees = [];
     const proj = firestore().collection('Empolyee');
