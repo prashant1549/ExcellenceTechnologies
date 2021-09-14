@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './src/components/Login';
 import ExcelleceDrawer from './src/drawer/ExcelleceDrawer';
 import AddProject from './src/components/pages/AddProject';
+import WorkStatus from './src/components/pages/WorkStatus';
 import UserProfile from './src/components/pages/UserProfile';
 import ProjectDetails from './src/components/pages/ProjectDetails';
 
@@ -46,6 +47,7 @@ const App = () => {
             />
             <Stack.Screen name="Add Project" component={AddProject} />
             <Stack.Screen name="Profile" component={UserProfile} />
+            <Stack.Screen name="Work Status" component={WorkStatus} />
             <Stack.Screen
               options={({route}) => ({
                 title: route.params.name,
