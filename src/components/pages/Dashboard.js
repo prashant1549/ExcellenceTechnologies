@@ -8,8 +8,6 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
-  const ref = useRef(null);
-  const [modalVisible, setModalVisible] = useState(false);
   useEffect(async () => {
     const projects = [];
     const proj = firestore().collection('projects');
@@ -27,6 +25,21 @@ const Dashboard = ({navigation}) => {
   const currentUser = useSelector(state => state.ProjectReducer.user);
   return (
     <View style={{flex: 1}}>
+      <View style={{flex: 1, flexDirection: 'row-reverse'}}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Add Project')}
+          style={{
+            width: 150,
+            height: 50,
+            backgroundColor: 'lightblue',
+            borderRadius: 10,
+            margin: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{fontWeight: 'bold', fontSize: 20}}>Add Project</Text>
+        </TouchableOpacity>
+      </View>
       <View style={{flex: 5}}>
         <FlatList
           data={Data.length > 0 ? Data : ''}

@@ -67,9 +67,9 @@ const Report = ({navigation}) => {
       <View style={{flexDirection: 'row-reverse'}}>
         <View style={{flexDirection: 'row', marginRight: 50}}>
           <Text style={{fontWeight: 'bold', marginHorizontal: 20}}>
-            TOTALE PRICE = $
+            TOTALE PRICE =
           </Text>
-          <Text>{totleprice}</Text>
+          <Text>{totleprice}$</Text>
         </View>
       </View>
     </View>
