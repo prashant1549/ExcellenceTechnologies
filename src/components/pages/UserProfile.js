@@ -1,19 +1,59 @@
 import React from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import auth from '@react-native-firebase/auth';
+import ImagePicker from 'react-native-image-crop-picker';
+import firestore from '@react-native-firebase/firestore';
+// import app from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage'; // 1
+
+import {allEmployee, userProfile} from '../../redux/Action/Action';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfile = ({navigation}) => {
-  const Data = auth().currentUser;
+  const dispatch = useDispatch();
+  const currentUser = useSelector(state => state.ProjectReducer.user);
+  const user = useSelector(state => state.ProjectReducer.employees);
+  const handleImage = () => {
+    const index = user.findIndex(n1 => n1.empid === currentUser.empid);
+    const string = (Math.random() + 1).toString(36).substring(7);
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(async image => {
+      await storage()
+        .ref('photos/profile_' + string + '.jpg')
+        .putFile(image.path);
+      const url = await storage()
+        .ref('photos/profile_' + string + '.jpg')
+        .getDownloadURL();
+
+      await firestore().collection('Empolyee').doc(currentUser.empid).update({
+        photo: url,
+      });
+      user[index].photo = url;
+      dispatch(allEmployee(user));
+      dispatch(userProfile(user[index]));
+      await AsyncStorage.setItem('UserProfile', JSON.stringify(user[index]));
+    });
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{alignItems: 'center', marginTop: 20}}>
-        <Image
-          style={{width: 150, height: 150}}
-          source={{uri: Data.photoURL}}
-        />
+        <TouchableOpacity onPress={() => handleImage()}>
+          <Image
+            style={{width: 150, height: 150}}
+            source={
+              currentUser.photo == ''
+                ? require('../../assets/avtar.png')
+                : {uri: currentUser.photo}
+            }
+          />
+        </TouchableOpacity>
         <Text style={{fontSize: 20, marginVertical: 10, fontWeight: 'bold'}}>
-          {Data.displayName.toUpperCase()}
+          {currentUser.name.toUpperCase()}
         </Text>
       </View>
       <View>
@@ -24,8 +64,9 @@ const UserProfile = ({navigation}) => {
             marginHorizontal: 10,
             marginVertical: 5,
           }}>
-          Email : {Data.email}
+          Email : {currentUser.email}
         </Text>
+
         <Text
           style={{
             fontWeight: 'bold',
@@ -33,16 +74,7 @@ const UserProfile = ({navigation}) => {
             marginHorizontal: 10,
             marginVertical: 5,
           }}>
-          Designation : React Native Developer
-        </Text>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            fontSize: 16,
-            marginHorizontal: 10,
-            marginVertical: 5,
-          }}>
-          Role : Empolyee
+          Role : {currentUser.role}
         </Text>
       </View>
       <View

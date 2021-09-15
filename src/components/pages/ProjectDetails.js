@@ -12,7 +12,7 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 import MultiSelect from 'react-native-multiple-select';
 import firestore from '@react-native-firebase/firestore';
-import {allProjects} from '../../redux/Action/Action';
+import {allProjects, allEmployee} from '../../redux/Action/Action';
 import {TextInput} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 
@@ -24,10 +24,12 @@ const ProjectDetails = props => {
   const [emparray, setEmpArray] = useState([]);
   const [addTime, setAddtime] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
+  const currentUser = useSelector(state => state.ProjectReducer.user);
   const Data = useSelector(state => state.ProjectReducer.project);
   const filterProject = Data.filter(
     item => item.projectId === props.route.params.projectId,
   );
+
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
       const employees = [];
@@ -45,7 +47,7 @@ const ProjectDetails = props => {
     });
     return unsubscribe;
   }, [props.navigation]);
-
+  console.log(emparray);
   const onSelectedItemsChange = async selectedItems => {
     // Set Selected Items
     const filnedata = Data.findIndex(
@@ -59,37 +61,57 @@ const ProjectDetails = props => {
         .update({
           assignTo: selectedItems,
         });
+
       if (selectedItems.length > 0) {
         for (let i = 0; i < selectedItems.length; i++) {
           const userOne = await firestore()
             .collection('Empolyee')
             .doc(selectedItems[i])
-            .get();
-          const value = userOne?._data?.projects?.includes(
-            props.route.params.projectId,
-          );
-          if (value === false) {
-            await firestore()
-              .collection('Empolyee')
-              .doc(selectedItems[i])
-              .update({
-                projects: userOne._data.projects.push(
-                  props.route.params.projectId,
-                ),
-              });
-          } else {
-            ToastAndroid.showWithGravityAndOffset(
-              'Project allready assign',
-              ToastAndroid.LONG,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
-          }
+            .get()
+            .then(async employee => {
+              const projects = employee.data().projects;
+
+              if (!projects.includes(props.route.params.projectId)) {
+                projects.push(props.route.params.projectId);
+                await firestore()
+                  .collection('Empolyee')
+                  .doc(selectedItems[i])
+                  .update({projects});
+              }
+            });
         }
       }
+
+      const nonSelectedArray = emparray.filter(
+        el => !selectedItems.includes(el.id),
+      );
+      nonSelectedArray.forEach(async element => {
+        await firestore()
+          .collection('Empolyee')
+          .doc(element.id)
+          .get()
+          .then(async employee => {
+            let projects = employee.data().projects;
+            if (projects.includes(props.route.params.projectId)) {
+              const index = projects.indexOf(props.route.params.projectId);
+              projects.splice(index, 1);
+              await firestore()
+                .collection('Empolyee')
+                .doc(element.id)
+                .update({projects});
+            }
+          });
+      });
       dispatch(allProjects(Data));
       setSelectedItems(selectedItems);
+      const employees = [];
+      const proj = firestore().collection('Empolyee');
+      const snapshot = await proj.get();
+      snapshot.forEach(doc => {
+        const data = {...doc.data(), ...{empid: doc.id}};
+        employees.push(data);
+      });
+      dispatch(allEmployee(employees));
     } catch (err) {
       console.log(err.message, 'XXXXXXXXXXXXXXXXXXxxxx');
     }
@@ -115,15 +137,21 @@ const ProjectDetails = props => {
       25,
       50,
     );
+    const projects = [];
+    const proj = firestore().collection('projects');
+    const snapshot = await proj.get();
+    snapshot.forEach(doc => {
+      const data = {...doc.data(), ...{projectId: doc.id}};
+      projects.push(data);
+    });
+    dispatch(allProjects(projects));
     setAddtime('');
-    dispatch(allProjects(Data));
     setAddWorkVisible(false);
   };
   const callBack = () => {
     setAddWorkVisible(false);
     setDateVisible(false);
   };
-  console.log(Data);
   return (
     <View style={{flex: 1, backgroundColor: '#fff', flexDirection: 'column'}}>
       <View style={{left: 72, flex: 0.7}}>
@@ -150,44 +178,41 @@ const ProjectDetails = props => {
           }
           style={{marginVertical: 10}}
           horizontal={true}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index}
           renderItem={item => (
             <View style={{marginHorizontal: 5}}>
               <Image
                 style={{width: 50, height: 50, borderRadius: 25}}
-                source={{
-                  uri:
-                    emparray.length > 0
-                      ? emparray.find(n1 => n1.id == item.item)?.user.photo
-                      : 'asda',
-                }}
+                source={
+                  emparray?.find(n1 => n1.id == item.item)?.user.photo == ''
+                    ? require('../../assets/avtar.png')
+                    : {uri: emparray.find(n1 => n1.id == item.item)?.user.photo}
+                }
               />
             </View>
           )}
         />
-        <View
-          style={{
-            width: 270,
-            height: 1,
-            borderColor: 'lightgray',
-            borderWidth: 1,
-            marginVertical: 20,
-          }}
-        />
-        <View style={{flexDirection: 'row', marginVertical: 10}}>
-          <View style={{flex: 0.4}}>
-            <Text style={{fontWeight: 'bold', color: 'gray'}}>STATUS</Text>
-          </View>
-          <View style={{flex: 0.3, alignItems: 'flex-end'}}>
-            <Text
+
+        {currentUser?.role === 'admin' ? (
+          <View style={{flexDirection: 'row', top: -20}}>
+            <TouchableOpacity
               style={{
-                fontWeight: 'bold',
-                color: 'blue',
-              }}>
-              BACKLOG
-            </Text>
+                backgroundColor: 'blue',
+                width: 130,
+                height: 50,
+                borderRadius: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => setDateVisible(true)}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                ASSIGNED TO
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        ) : (
+          <View />
+        )}
         <View
           style={{
             width: 270,
@@ -236,24 +261,30 @@ const ProjectDetails = props => {
           marginTop: 40,
           justifyContent: 'center',
         }}>
-        <View
-          style={{
-            margin: 30,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <TouchableOpacity onPress={() => setDateVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ASSIGNED TO</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>
-              WORK STATUS{' '}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
-            <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD WORK</Text>
-          </TouchableOpacity>
-        </View>
+        {filterProject[0]?.projectType === 'Hourly' ? (
+          <View
+            style={{
+              margin: 30,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate('Work Status', {
+                  projectId: props.route.params.projectId,
+                })
+              }>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                PROJECT STATUS{' '}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setAddWorkVisible(true)}>
+              <Text style={{color: '#fff', fontWeight: 'bold'}}>ADD LOG</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View />
+        )}
       </View>
       <Modal
         animationType="slide"
@@ -320,7 +351,7 @@ const ProjectDetails = props => {
         transparent={true}
         visible={addWorkVisible}
         onRequestClose={() => {
-          alert('Modal has been closed.');
+          // alert('Modal has been closed.');
           callBack();
         }}>
         <View

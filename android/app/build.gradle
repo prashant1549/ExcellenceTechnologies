@@ -131,11 +131,12 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.excellencetexhnology"
+        applicationId "com.excellencetechnology"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     splits {
         abi {
@@ -158,6 +159,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            crunchPngs false
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
@@ -190,6 +192,7 @@ dependencies {
 implementation platform('com.google.firebase:firebase-bom:28.3.1')
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 implementation 'com.google.firebase:firebase-analytics'
+implementation 'com.android.support:multidex:2.0.1'
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }

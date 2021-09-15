@@ -21,6 +21,7 @@ const AddEmployee = ({navigation}) => {
   });
 
   const handleSubmit = async () => {
+    console.log(employee.email);
     if (employee.email == '' || employee.name == '') {
       ToastAndroid.showWithGravityAndOffset(
         'Please fill all given field',
@@ -33,10 +34,14 @@ const AddEmployee = ({navigation}) => {
       auth()
         .createUserWithEmailAndPassword(employee.email, employee.name)
         .then(res => {
+          console.log(res);
           const unseData = {
             email: res.user._user.email,
             role: 'empolyee',
             projects: [],
+            name: employee.name,
+            isActive: true,
+            photo: '',
           };
           dispatch(createEmployee(unseData));
           const usersCollection = firestore()

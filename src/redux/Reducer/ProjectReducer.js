@@ -4,12 +4,14 @@ import {
   USER_PROFILE,
   CREATE_EMPLOYEE,
   ALL_EMPLOYEE,
+  ACCESS_TOKEN,
 } from '../Action/Type';
 
 const initialState = {
   project: [],
   user: {},
   employees: [],
+  token: null,
 };
 
 export default (state = initialState, action) => {
@@ -28,6 +30,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         user: action.user,
+      };
+    case ACCESS_TOKEN:
+      return {
+        ...state,
+        token: action.token,
       };
     case CREATE_EMPLOYEE:
       return {
