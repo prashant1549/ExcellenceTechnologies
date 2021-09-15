@@ -8,29 +8,32 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const Dashboard = ({navigation}) => {
   const dispatch = useDispatch();
-  useEffect(async () => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const projects = [];
-      const proj = firestore().collection('projects');
-      const snapshot = await proj.get();
-      snapshot.forEach(doc => {
-        const data = {...doc.data(), ...{projectId: doc.id}};
-        projects.push(data);
-      });
-      dispatch(allProjects(projects));
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   const Data = useSelector(state => state.ProjectReducer.project);
   const user = useSelector(state => state.ProjectReducer.employees);
   const currentUser = useSelector(state => state.ProjectReducer.user);
-  console.log(Data);
+  useEffect(async () => {
+    // const unsubscribe = navigation.addListener('focus', async () => {
+    const projects = [];
+    const proj = firestore().collection('projects');
+    const snapshot = await proj.get();
+    snapshot.forEach(doc => {
+      const data = {...doc.data(), ...{projectId: doc.id}};
+      projects.push(data);
+    });
+    dispatch(allProjects(projects));
+    // });
+    // return unsubscribe;
+  }, []);
+  const selectedArray = Data.filter(el =>
+    currentUser?.projects?.includes(el.projectId),
+  );
+  console.log(selectedArray);
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 5}}>
         <FlatList
-          data={Data.length > 0 ? Data : ''}
+          data={selectedArray.length > 0 ? selectedArray : ''}
           keyExtractor={item => item.id}
           renderItem={item => (
             <LinearGradient

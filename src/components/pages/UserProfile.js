@@ -4,6 +4,9 @@ import {useSelector, useDispatch} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
+// import app from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage'; // 1
+
 import {allEmployee, userProfile} from '../../redux/Action/Action';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -13,20 +16,29 @@ const UserProfile = ({navigation}) => {
   const user = useSelector(state => state.ProjectReducer.employees);
   const handleImage = () => {
     const index = user.findIndex(n1 => n1.empid === currentUser.empid);
+    const string = (Math.random() + 1).toString(36).substring(7);
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: true,
     }).then(async image => {
+      await storage()
+        .ref('photos/profile_' + string + '.jpg')
+        .putFile(image.path);
+      const url = await storage()
+        .ref('photos/profile_' + string + '.jpg')
+        .getDownloadURL();
+
       await firestore().collection('Empolyee').doc(currentUser.empid).update({
-        photo: image.path,
+        photo: url,
       });
-      user[index].photo = image.path;
+      user[index].photo = url;
       dispatch(allEmployee(user));
       dispatch(userProfile(user[index]));
       await AsyncStorage.setItem('UserProfile', JSON.stringify(user[index]));
     });
   };
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{alignItems: 'center', marginTop: 20}}>

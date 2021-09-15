@@ -15,7 +15,7 @@ import RadioForm, {
 import {Calendar} from 'react-native-calendars';
 import firestore from '@react-native-firebase/firestore';
 import {useDispatch, useSelector} from 'react-redux';
-import {createProject} from '../../redux/Action/Action';
+import {createProject, userProfile} from '../../redux/Action/Action';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 
@@ -29,7 +29,11 @@ const AddProject = ({navigation}) => {
     projectCost: '',
     projectType: '',
     expectedTime: '',
+    assignTo: [],
+    work: [],
+    createdAt: '',
   });
+  const currentUser = useSelector(state => state.ProjectReducer.user);
   const currentDate = moment(new Date()).format('yyyy-MM-DD');
   const data = [
     {label: 'Monthly', value: 'Monthly'},
@@ -62,9 +66,25 @@ const AddProject = ({navigation}) => {
       );
     } else {
       project.id = Math.floor(Math.random() * 1000 + 1);
+      project.createdAt = new Date();
       dispatch(createProject(project));
-      const usersCollection = firestore().collection('projects').add(project);
-
+      await firestore().collection('projects').add(project);
+      const projects = [];
+      const projectarray = [];
+      const proj = firestore().collection('projects');
+      const snapshot = await proj.get();
+      snapshot.forEach(doc => {
+        projectarray.push(doc.id);
+        const data1 = {...doc.data(), ...{projectId: doc.id}};
+        projects.push(data1);
+      });
+      await firestore()
+        .collection('Empolyee')
+        .doc(currentUser?.empid)
+        .update({projects: projectarray});
+      const currentData = {...currentUser};
+      currentData.projects = projectarray;
+      dispatch(userProfile(currentData));
       ToastAndroid.showWithGravityAndOffset(
         'Successfully created',
         ToastAndroid.LONG,
@@ -89,7 +109,6 @@ const AddProject = ({navigation}) => {
     data[value] = text;
     setProject(data);
   };
-  console.log(Object.values(project).length);
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{alignItems: 'center', marginVertical: 20}}>

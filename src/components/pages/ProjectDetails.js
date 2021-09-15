@@ -12,7 +12,7 @@ import {
 import {useSelector, useDispatch} from 'react-redux';
 import MultiSelect from 'react-native-multiple-select';
 import firestore from '@react-native-firebase/firestore';
-import {allProjects} from '../../redux/Action/Action';
+import {allProjects, allEmployee} from '../../redux/Action/Action';
 import {TextInput} from 'react-native-gesture-handler';
 import auth from '@react-native-firebase/auth';
 
@@ -29,6 +29,7 @@ const ProjectDetails = props => {
   const filterProject = Data.filter(
     item => item.projectId === props.route.params.projectId,
   );
+
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
       const employees = [];
@@ -46,7 +47,7 @@ const ProjectDetails = props => {
     });
     return unsubscribe;
   }, [props.navigation]);
-
+  console.log(emparray);
   const onSelectedItemsChange = async selectedItems => {
     // Set Selected Items
     const filnedata = Data.findIndex(
@@ -60,37 +61,57 @@ const ProjectDetails = props => {
         .update({
           assignTo: selectedItems,
         });
+
       if (selectedItems.length > 0) {
         for (let i = 0; i < selectedItems.length; i++) {
           const userOne = await firestore()
             .collection('Empolyee')
             .doc(selectedItems[i])
-            .get();
-          const value = userOne?._data?.projects?.includes(
-            props.route.params.projectId,
-          );
-          if (value === false) {
-            await firestore()
-              .collection('Empolyee')
-              .doc(selectedItems[i])
-              .update({
-                projects: userOne._data.projects.push(
-                  props.route.params.projectId,
-                ),
-              });
-          } else {
-            ToastAndroid.showWithGravityAndOffset(
-              'Project allready assign',
-              ToastAndroid.LONG,
-              ToastAndroid.BOTTOM,
-              25,
-              50,
-            );
-          }
+            .get()
+            .then(async employee => {
+              const projects = employee.data().projects;
+
+              if (!projects.includes(props.route.params.projectId)) {
+                projects.push(props.route.params.projectId);
+                await firestore()
+                  .collection('Empolyee')
+                  .doc(selectedItems[i])
+                  .update({projects});
+              }
+            });
         }
       }
+
+      const nonSelectedArray = emparray.filter(
+        el => !selectedItems.includes(el.id),
+      );
+      nonSelectedArray.forEach(async element => {
+        await firestore()
+          .collection('Empolyee')
+          .doc(element.id)
+          .get()
+          .then(async employee => {
+            let projects = employee.data().projects;
+            if (projects.includes(props.route.params.projectId)) {
+              const index = projects.indexOf(props.route.params.projectId);
+              projects.splice(index, 1);
+              await firestore()
+                .collection('Empolyee')
+                .doc(element.id)
+                .update({projects});
+            }
+          });
+      });
       dispatch(allProjects(Data));
       setSelectedItems(selectedItems);
+      const employees = [];
+      const proj = firestore().collection('Empolyee');
+      const snapshot = await proj.get();
+      snapshot.forEach(doc => {
+        const data = {...doc.data(), ...{empid: doc.id}};
+        employees.push(data);
+      });
+      dispatch(allEmployee(employees));
     } catch (err) {
       console.log(err.message, 'XXXXXXXXXXXXXXXXXXxxxx');
     }
@@ -157,7 +178,7 @@ const ProjectDetails = props => {
           }
           style={{marginVertical: 10}}
           horizontal={true}
-          keyExtractor={item => item.id}
+          keyExtractor={(item, index) => index}
           renderItem={item => (
             <View style={{marginHorizontal: 5}}>
               <Image
@@ -330,7 +351,7 @@ const ProjectDetails = props => {
         transparent={true}
         visible={addWorkVisible}
         onRequestClose={() => {
-          alert('Modal has been closed.');
+          // alert('Modal has been closed.');
           callBack();
         }}>
         <View
