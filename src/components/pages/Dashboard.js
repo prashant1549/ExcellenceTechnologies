@@ -13,27 +13,33 @@ const Dashboard = ({navigation}) => {
   const user = useSelector(state => state.ProjectReducer.employees);
   const currentUser = useSelector(state => state.ProjectReducer.user);
   useEffect(async () => {
-    // const unsubscribe = navigation.addListener('focus', async () => {
-    const projects = [];
-    const proj = firestore().collection('projects');
-    const snapshot = await proj.get();
-    snapshot.forEach(doc => {
-      const data = {...doc.data(), ...{projectId: doc.id}};
-      projects.push(data);
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const projects = [];
+      const proj = firestore().collection('projects');
+      const snapshot = await proj.get();
+      snapshot.forEach(doc => {
+        const data = {...doc.data(), ...{projectId: doc.id}};
+        projects.push(data);
+      });
+      dispatch(allProjects(projects));
     });
-    dispatch(allProjects(projects));
-    // });
-    // return unsubscribe;
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
   const selectedArray = Data.filter(el =>
     currentUser?.projects?.includes(el.projectId),
   );
-  console.log(selectedArray);
+
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 5}}>
         <FlatList
-          data={selectedArray.length > 0 ? selectedArray : ''}
+          data={
+            currentUser?.role == 'admin'
+              ? Data
+              : selectedArray?.length > 0
+              ? selectedArray
+              : ''
+          }
           keyExtractor={item => item.id}
           renderItem={item => (
             <LinearGradient
@@ -129,37 +135,6 @@ const Dashboard = ({navigation}) => {
           <View />
         )}
       </View>
-      {currentUser?.role === 'admin' ? (
-        <View
-          style={{
-            flex: 0.6,
-            backgroundColor: 'lightblue',
-            justifyContent: 'center',
-          }}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-            <TouchableOpacity
-              style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('Dashboard')}>
-              <Icon size={30} color="#000" name="list" />
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>PROJECTS</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('User')}>
-              <Icon size={30} color="#000" name="people" />
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>USER</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('Report')}>
-              <Icon size={30} color="#000" name="report" />
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>REPORT</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) : (
-        <View />
-      )}
     </View>
   );
 };

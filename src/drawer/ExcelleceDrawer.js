@@ -16,10 +16,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Dashboard from '../components/pages/Dashboard';
+import Home from '../components/pages/Home';
 import AddEmployee from '../components/pages/AddEmpolyee';
 import {useDispatch, useSelector} from 'react-redux';
-import UserList from '../components/pages/UserList';
-import Report from '../components/pages/Report';
+// import UserList from '../components/pages/UserList';
+// import Report from '../components/pages/Report';
 import {accessToken, userProfile} from '../redux/Action/Action';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -51,7 +52,6 @@ function CustomDrawerContent(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
-  console.log(currentUser?.photo, 'updatedCode');
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('AceessToken');
@@ -186,27 +186,27 @@ function CustomDrawerContent(props) {
 export default function ExcelleceDrawer({navigation}) {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.ProjectReducer.user);
-  useEffect(async () => {
-    const employees = [];
-    const proj = firestore().collection('Empolyee');
-    const snapshot = await proj.get();
-    snapshot.forEach(doc => {
-      const data = {...doc.data(), ...{empid: doc.id}};
-      employees.push(data);
-    });
-    dispatch(allEmployee(employees));
-    return () => subscriber();
-  }, [navigation]);
+  // useEffect(async () => {
+  //   const employees = [];
+  //   const proj = firestore().collection('Empolyee');
+  //   const snapshot = await proj.get();
+  //   snapshot.forEach(doc => {
+  //     const data = {...doc.data(), ...{empid: doc.id}};
+  //     employees.push(data);
+  //   });
+  //   dispatch(allEmployee(employees));
+  //   return () => subscriber();
+  // }, [navigation]);
   return (
     <View style={{flex: 1}}>
       <React.Fragment>
         {currentUser?.role === 'admin' ? (
           <Drawer.Navigator
             drawerContent={props => <CustomDrawerContent {...props} />}>
-            <Drawer.Screen name="Dashboard" component={Dashboard} />
+            <Drawer.Screen name="Dashboard" component={Home} />
             <Drawer.Screen name="Create Employee" component={AddEmployee} />
-            <Drawer.Screen name="User" component={UserList} />
-            <Drawer.Screen name="Report" component={Report} />
+            {/* <Drawer.Screen name="User" component={UserList} /> */}
+            {/* <Drawer.Screen name="Report" component={Report} /> */}
           </Drawer.Navigator>
         ) : (
           <Drawer.Navigator
