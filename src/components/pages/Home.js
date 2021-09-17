@@ -3,8 +3,10 @@ import Dashboard from './Dashboard';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import UserList from './UserList';
 import Report from './Report';
-import {View, Text} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
+import LandingPage from './LandingPage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AddProject from './AddProject';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +19,30 @@ const Home = () => {
           height: 70,
         },
       }}>
+      <Tab.Screen
+        name="Home"
+        component={LandingPage}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <Icon
+                size={30}
+                color={focused ? '#e32f45' : '#748c94'}
+                name="home"
+              />
+              <Text
+                style={{
+                  color: focused ? '#e32f45' : '#748c94',
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                }}>
+                Home
+              </Text>
+            </View>
+          ),
+        }}
+      />
       <Tab.Screen
         name="Project"
         component={Dashboard}
@@ -37,6 +63,28 @@ const Home = () => {
                 }}>
                 Project
               </Text>
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Add Project"
+        component={AddProject}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <View
+                style={{
+                  width: 50,
+                  height: 50,
+                  backgroundColor: focused ? '#e32f45' : '#A88B97',
+                  borderRadius: 25,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Icon size={40} name="add" color="#fff" />
+              </View>
             </View>
           ),
         }}
