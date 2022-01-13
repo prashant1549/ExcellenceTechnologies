@@ -189,6 +189,11 @@ const ProjectDetails = props => {
                     : {uri: emparray.find(n1 => n1.id == item.item)?.user.photo}
                 }
               />
+              <Text style={{fontSize: 7, textAlign: 'center'}}>
+                {emparray?.find(n1 => n1.id == item.item)?.user.name == ''
+                  ? require('../../assets/avtar.png')
+                  : emparray.find(n1 => n1.id == item.item)?.user.name}
+              </Text>
             </View>
           )}
         />
